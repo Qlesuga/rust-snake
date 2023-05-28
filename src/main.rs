@@ -12,7 +12,14 @@ use piston::window::WindowSettings;
 
 use std::collections::LinkedList;
 
-const TILE_SIZE: f64 = 20.0;
+const SCREEN_SIZE: [u32;2] = [300,300];
+const TILE_SIZE: u32 = 25;
+const ROWS: u32 = SCREEN_SIZE[0] / TILE_SIZE;
+const COLS: u32 = SCREEN_SIZE[1] / TILE_SIZE;
+
+const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
+const RED: [f32;4] = [1.0,0.0,0.0,1.0];
+const BLUE: [f32;4] = [0.0,0.0,1.0,1.0];
 
 pub struct App {
     gl: GlGraphics,
@@ -36,14 +43,10 @@ impl Snake{
     fn render(&mut self, args: &RenderArgs){
         use graphics::*;
 
-
-        const RED: [f32;4] = [1.0,0.0,0.0,1.0];
-
-
         let mut iter = self.snake_parts.iter_mut();
         while let Some(node) = iter.next() {
 
-            let square = rectangle::square(node.x as f64 * TILE_SIZE,node.y as f64 * TILE_SIZE, TILE_SIZE);
+            let square = rectangle::square((node.x * TILE_SIZE as i32) as f64,(node.y * TILE_SIZE as i32) as f64, TILE_SIZE as f64);
             self.gl.draw(args.viewport(), | c, gl| {
                 let transform = c.transform;
 
@@ -84,8 +87,6 @@ impl App {
     fn render(&mut self, args: &RenderArgs) {
         use graphics::*;
 
-        const GREEN: [f32; 4] = [0.0, 1.0, 0.0, 1.0];
-
         let square = rectangle::square(0.0, 0.0, 200.0);
 
         self.gl.draw(args.viewport(), |c, gl| {
@@ -107,7 +108,7 @@ impl App {
 fn main() {
     let opengl = OpenGL::V3_2;
 
-    let mut window: Window = WindowSettings::new("snake", [300, 300])
+    let mut window: Window = WindowSettings::new("snake", SCREEN_SIZE)
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
