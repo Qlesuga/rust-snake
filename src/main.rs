@@ -21,19 +21,13 @@ pub struct App {
 
 struct Snake{
     gl: GlGraphics,
-    snake_parts: LinkedList<Position>,
-    direction: Direction,
-    pos: Position
+    snake_parts: LinkedList<Coordinates>,
+    direction: Coordinates,
+    pos: Coordinates
 }
 
 #[derive(Clone,Copy)]
-struct Direction{
-    x: i32,
-    y: i32
-}
-
-#[derive(Clone,Copy)]
-struct Position{
+struct Coordinates{
     x: i32,
     y: i32
 }
@@ -70,17 +64,17 @@ impl Snake{
         }
 
         if let Some(mut node) = self.snake_parts.front_mut() {
-            *node = Position{x:self.pos.x,y:self.pos.y};
+            *node = Coordinates{x:self.pos.x,y:self.pos.y};
         }
 
     }
 
     fn pressed(&mut self, btn: &Button){
         self.direction = match btn {
-            &Button::Keyboard(Key::Up) if self.direction.y != 1  => Direction{x:0,y:-1},
-            &Button::Keyboard(Key::Down) if self.direction.y != -1 => Direction{x:0,y:1},
-            &Button::Keyboard(Key::Left) if self.direction.x != 1 => Direction{x:-1,y:0},
-            &Button::Keyboard(Key::Right) if self.direction.x != -1 => Direction{x:1,y:0},
+            &Button::Keyboard(Key::Up) if self.direction.y != 1  => Coordinates{x:0,y:-1},
+            &Button::Keyboard(Key::Down) if self.direction.y != -1 => Coordinates{x:0,y:1},
+            &Button::Keyboard(Key::Left) if self.direction.x != 1 => Coordinates{x:-1,y:0},
+            &Button::Keyboard(Key::Right) if self.direction.x != -1 => Coordinates{x:1,y:0},
             _ => self.direction
         };
     }
@@ -113,7 +107,7 @@ impl App {
 fn main() {
     let opengl = OpenGL::V3_2;
 
-    let mut window: Window = WindowSettings::new("snake", [700, 700])
+    let mut window: Window = WindowSettings::new("snake", [300, 300])
         .graphics_api(opengl)
         .exit_on_esc(true)
         .build()
@@ -123,13 +117,13 @@ fn main() {
         gl: GlGraphics::new(opengl),
         snake: Snake{
             gl: GlGraphics::new(opengl),
-            pos: Position{x:4,y:4},
-            snake_parts: LinkedList::from([Position{x:4,y:4},Position{x:3,y:4},Position{x:2,y:4}]),
-            direction: Direction{x:1,y:0}
+            pos: Coordinates{x:4,y:4},
+            snake_parts: LinkedList::from([Coordinates{x:4,y:4},Coordinates{x:3,y:4},Coordinates{x:2,y:4}]),
+            direction: Coordinates{x:1,y:0}
         }
     };
 
-    let mut events = Events::new(EventSettings::new().ups(8));
+    let mut events = Events::new(EventSettings::new().ups(12));
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
             app.render(&args);
