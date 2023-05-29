@@ -52,6 +52,11 @@ impl Food{
             rectangle(BLUE, square, transform, gl);
         })
     }
+
+    fn new_pos(&mut self){
+        let mut rng = rand::thread_rng();
+        self.pos = Coordinates{x: rng.gen_range(0..ROWS as i32),y:rng.gen_range(0..COLS as i32)};
+    }
 }
 
 #[derive(Clone,Copy)]
@@ -102,8 +107,24 @@ impl Snake{
             _ => self.direction
         };
     }
+
+    fn is_colliding(&mut self, pos: Coordinates) -> bool{
+        let mut iter = self.snake_parts.iter_mut();
+        while let Some(node) = iter.next() {
+            if is_colliding(*node,pos) {
+                return true
+            }
+        }
+        return false
+    }
 }
 
+fn is_colliding(pos1: Coordinates, pos2: Coordinates) -> bool{
+    if pos1.x == pos2.x && pos1.y == pos2.y {
+        return true
+    }
+    return false
+}
 
 impl App {
     fn render(&mut self, args: &RenderArgs) {
@@ -121,6 +142,10 @@ impl App {
 
     fn update(&mut self, args: &UpdateArgs){
         self.snake.update(args);
+        if self.snake.is_colliding(self.food.pos) {
+            self.snake.snake_parts.push_back(Coordinates{x:-1,y:-1});
+            self.food.new_pos();
+        }
     }
 
     fn pressed(&mut self, btn: &Button){
@@ -152,7 +177,7 @@ fn main() {
         }
     };
 
-    let mut events = Events::new(EventSettings::new().ups(12));
+    let mut events = Events::new(EventSettings::new().ups(8));
     while let Some(e) = events.next(&mut window) {
         if let Some(args) = e.render_args() {
             app.render(&args);
