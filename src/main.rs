@@ -2,6 +2,7 @@ extern crate glutin_window;
 extern crate graphics;
 extern crate opengl_graphics;
 extern crate piston;
+extern crate rand;
 
 use piston::event_loop::*;
 use glutin_window::GlutinWindow as Window;
@@ -11,8 +12,9 @@ use piston::input::*;
 use piston::window::WindowSettings;
 
 use std::collections::LinkedList;
+use rand::Rng;
 
-const SCREEN_SIZE: [u32;2] = [300,300];
+const SCREEN_SIZE: [u32;2] = [400,400];
 const TILE_SIZE: u32 = 25;
 const ROWS: u32 = SCREEN_SIZE[0] / TILE_SIZE;
 const COLS: u32 = SCREEN_SIZE[1] / TILE_SIZE;
@@ -23,7 +25,8 @@ const BLUE: [f32;4] = [0.0,0.0,1.0,1.0];
 
 pub struct App {
     gl: GlGraphics,
-    snake: Snake
+    snake: Snake,
+    food: Food
 }
 
 struct Snake{
@@ -31,6 +34,24 @@ struct Snake{
     snake_parts: LinkedList<Coordinates>,
     direction: Coordinates,
     pos: Coordinates
+}
+
+struct Food{
+    gl: GlGraphics,
+    pos: Coordinates,
+}
+
+impl Food{
+    fn render(&mut self, args: &RenderArgs){
+        use graphics::*;
+
+        let square = rectangle::square((self.pos.x * TILE_SIZE as i32) as f64,(self.pos.y * TILE_SIZE as i32) as f64, TILE_SIZE as f64);
+        self.gl.draw(args.viewport(), | c, gl| {
+            let transform = c.transform;
+
+            rectangle(BLUE, square, transform, gl);
+        })
+    }
 }
 
 #[derive(Clone,Copy)]
@@ -83,6 +104,7 @@ impl Snake{
     }
 }
 
+
 impl App {
     fn render(&mut self, args: &RenderArgs) {
         use graphics::*;
@@ -94,6 +116,7 @@ impl App {
         });
 
         self.snake.render(args);
+        self.food.render(args)
     }
 
     fn update(&mut self, args: &UpdateArgs){
@@ -104,7 +127,6 @@ impl App {
         self.snake.pressed(btn);
     }
 }
-
 fn main() {
     let opengl = OpenGL::V3_2;
 
@@ -114,6 +136,8 @@ fn main() {
         .build()
         .unwrap();
 
+    let mut rng = rand::thread_rng();
+    
     let mut app = App {
         gl: GlGraphics::new(opengl),
         snake: Snake{
@@ -121,6 +145,10 @@ fn main() {
             pos: Coordinates{x:4,y:4},
             snake_parts: LinkedList::from([Coordinates{x:4,y:4},Coordinates{x:3,y:4},Coordinates{x:2,y:4}]),
             direction: Coordinates{x:1,y:0}
+        },
+        food: Food{
+            gl: GlGraphics::new(opengl),
+            pos: Coordinates{x: rng.gen_range(0..ROWS as i32),y:rng.gen_range(0..COLS as i32)}
         }
     };
 
