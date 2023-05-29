@@ -33,6 +33,7 @@ struct Snake{
     gl: GlGraphics,
     snake_parts: LinkedList<Coordinates>,
     direction: Coordinates,
+    new_direction: Coordinates,
     pos: Coordinates
 }
 
@@ -82,6 +83,14 @@ impl Snake{
     }
 
     fn update(&mut self, args: &UpdateArgs){
+        self.direction = match self.new_direction{
+            Coordinates{x:1,y:0} if self.direction.x != -1 => Coordinates{x:1,y:0},
+            Coordinates{x:-1,y:0} if self.direction.x != 1 => Coordinates{x:-1,y:0},
+            Coordinates{x:0,y:1} if self.direction.y != -1 => Coordinates{x:0,y:1},
+            Coordinates{x:0,y:-1} if self.direction.y != 1 => Coordinates{x:0,y:-1},
+            _ => self.direction
+        };
+
         self.pos.x += self.direction.x;
         self.pos.y += self.direction.y; 
         
@@ -99,11 +108,11 @@ impl Snake{
     }
 
     fn pressed(&mut self, btn: &Button){
-        self.direction = match btn {
-            &Button::Keyboard(Key::Up) if self.direction.y != 1  => Coordinates{x:0,y:-1},
-            &Button::Keyboard(Key::Down) if self.direction.y != -1 => Coordinates{x:0,y:1},
-            &Button::Keyboard(Key::Left) if self.direction.x != 1 => Coordinates{x:-1,y:0},
-            &Button::Keyboard(Key::Right) if self.direction.x != -1 => Coordinates{x:1,y:0},
+        self.new_direction = match btn {
+            &Button::Keyboard(Key::Up) => Coordinates{x:0,y:-1},
+            &Button::Keyboard(Key::Down)  => Coordinates{x:0,y:1},
+            &Button::Keyboard(Key::Left)  => Coordinates{x:-1,y:0},
+            &Button::Keyboard(Key::Right)  => Coordinates{x:1,y:0},
             _ => self.direction
         };
     }
@@ -169,7 +178,8 @@ fn main() {
             gl: GlGraphics::new(opengl),
             pos: Coordinates{x:4,y:4},
             snake_parts: LinkedList::from([Coordinates{x:4,y:4},Coordinates{x:3,y:4},Coordinates{x:2,y:4}]),
-            direction: Coordinates{x:1,y:0}
+            direction: Coordinates{x:1,y:0},
+            new_direction: Coordinates{x:1,y:0},
         },
         food: Food{
             gl: GlGraphics::new(opengl),
