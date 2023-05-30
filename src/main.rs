@@ -82,7 +82,7 @@ impl Snake{
         } 
     }
 
-    fn update(&mut self, args: &UpdateArgs){
+    fn update(&mut self){
         self.direction = match self.new_direction{
             Coordinates{x:1,y:0} if self.direction.x != -1 => Coordinates{x:1,y:0},
             Coordinates{x:-1,y:0} if self.direction.x != 1 => Coordinates{x:-1,y:0},
@@ -101,7 +101,7 @@ impl Snake{
             }
         }
 
-        if let Some(mut node) = self.snake_parts.front_mut() {
+        if let Some(node) = self.snake_parts.front_mut() {
             *node = Coordinates{x:self.pos.x,y:self.pos.y};
         }
 
@@ -137,11 +137,8 @@ fn is_colliding(pos1: Coordinates, pos2: Coordinates) -> bool{
 
 impl App {
     fn render(&mut self, args: &RenderArgs) {
-        use graphics::*;
-
-        let square = rectangle::square(0.0, 0.0, 200.0);
-
-        self.gl.draw(args.viewport(), |c, gl| {
+        
+        self.gl.draw(args.viewport(), |_c, gl| {
             graphics::clear(GREEN, gl);
         });
 
@@ -149,8 +146,8 @@ impl App {
         self.food.render(args)
     }
 
-    fn update(&mut self, args: &UpdateArgs){
-        self.snake.update(args);
+    fn update(&mut self){
+        self.snake.update();
         if self.snake.is_colliding(self.food.pos) {
             self.snake.snake_parts.push_back(Coordinates{x:-1,y:-1});
             self.food.new_pos();
@@ -193,8 +190,8 @@ fn main() {
             app.render(&args);
         }
 
-        if let Some(args) = e.update_args() {
-            app.update(&args)
+        if e.update_args().is_some() {
+            app.update()
         }
 
         if let Some(args) = e.button_args() {
