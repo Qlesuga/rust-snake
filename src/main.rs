@@ -99,10 +99,10 @@ impl Snake{
         let mut iter = self.snake_parts.iter_mut();
         if let Some(mut prev_node) = iter.next() {
             while let Some(node) = iter.next() {
+                *node = std::mem::replace(&mut prev_node, *node);
                 if is_colliding(&node, &head_pos){
                     close_window()
                 }
-                *node = std::mem::replace(&mut prev_node, *node);
             }
         }
 
