@@ -94,15 +94,20 @@ impl Snake{
         self.pos.x += self.direction.x;
         self.pos.y += self.direction.y; 
         
+        let head_pos: &Coordinates = &Coordinates { x: self.pos.x, y: self.pos.y };
+
         let mut iter = self.snake_parts.iter_mut();
         if let Some(mut prev_node) = iter.next() {
             while let Some(node) = iter.next() {
+                if is_colliding(&node, &head_pos){
+                    close_window()
+                }
                 *node = std::mem::replace(&mut prev_node, *node);
             }
         }
 
         if let Some(node) = self.snake_parts.front_mut() {
-            *node = Coordinates{x:self.pos.x,y:self.pos.y};
+            *node = *head_pos
         }
 
     }
@@ -120,7 +125,7 @@ impl Snake{
     fn is_colliding(&mut self, pos: Coordinates) -> bool{
         let mut iter = self.snake_parts.iter_mut();
         while let Some(node) = iter.next() {
-            if is_colliding(*node,pos) {
+            if is_colliding(&node,&pos) {
                 return true
             }
         }
@@ -128,11 +133,15 @@ impl Snake{
     }
 }
 
-fn is_colliding(pos1: Coordinates, pos2: Coordinates) -> bool{
+fn is_colliding(pos1: &Coordinates, pos2: &Coordinates) -> bool{
     if pos1.x == pos2.x && pos1.y == pos2.y {
         return true
     }
     return false
+}
+
+fn close_window(){
+    std::process::exit(0);
 }
 
 impl App {
