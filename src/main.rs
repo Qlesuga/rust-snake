@@ -123,13 +123,7 @@ impl Snake{
     }
 
     fn is_colliding(&mut self, pos: Coordinates) -> bool{
-        let mut iter = self.snake_parts.iter_mut();
-        while let Some(node) = iter.next() {
-            if is_colliding(&node,&pos) {
-                return true
-            }
-        }
-        return false
+        self.snake_parts.iter().any(|p| pos.x == p.x && pos.y == p.y)
     }
 }
 
