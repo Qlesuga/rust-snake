@@ -94,6 +94,10 @@ impl Snake{
         self.pos.x += self.direction.x;
         self.pos.y += self.direction.y; 
         
+        if self.pos.x > COLS as i32 || (self.pos.x+COLS as i32)<COLS as i32 || self.pos.y > ROWS as i32 || (self.pos.y+ROWS as i32)<ROWS as i32{
+            close_window();
+        }
+
         let head_pos: &Coordinates = &Coordinates { x: self.pos.x, y: self.pos.y };
 
         let mut iter = self.snake_parts.iter_mut();
