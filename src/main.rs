@@ -170,6 +170,7 @@ fn main() {
 
     let mut window: Window = WindowSettings::new("snake", SCREEN_SIZE)
         .graphics_api(opengl)
+        .resizable(false)
         .exit_on_esc(true)
         .build()
         .unwrap();
